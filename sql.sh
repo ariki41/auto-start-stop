@@ -8,8 +8,8 @@ PWD="/home/ariki/auto-start-stop"
 source ${PWD}/conf
 
 SQL="
-SET @AFTER = UNIX_TIMESTAMP(SUBTIME('${UPTIME}', '09:00:00'));
-SET @BEFORE = UNIX_TIMESTAMP(SUBTIME('${NOW}', '09:00:00'));
+SET @AFTER = UNIX_TIMESTAMP('${UPTIME}');
+SET @BEFORE = UNIX_TIMESTAMP('${NOW}');
 
 WITH recursive upd(depth, id, parent, path) AS (
 	SELECT 0, fileid, parent, path
@@ -23,7 +23,7 @@ WITH recursive upd(depth, id, parent, path) AS (
 
 SELECT * FROM upd WHERE depth > 0;"
 
-docker exec nextcloud_db_1 mysql -u ${DBUSER} -p${PASS} nextcloud -e "${SQL}" > ${PWD}/data
+docker exec nextcloud_db_1 mariadb -u ${DBUSER} -p${PASS} nextcloud -e "${SQL}" > ${PWD}/data
 sed -i -e '1d' ${PWD}/data
 
-scp -i ${PWD}/scp ${PWD}/data ariki@192.168.2.11:/home/ariki/discord_bot
+scp -i /home/ariki/.ssh/yuika_key ${PWD}/data ariki@yuika:/home/ariki/discord_bot_hazuki
